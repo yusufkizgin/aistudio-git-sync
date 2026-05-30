@@ -24,6 +24,12 @@
       }
     }
 
+    // Capture AI Studio's own API key for our use
+    if (url.includes("alkalimakersuite-pa.clients6.google.com")) {
+      const key = init?.headers?.["x-goog-api-key"];
+      if (key) localStorage.setItem("gs_api_key", key);
+    }
+
     return originalFetch(input, init);
   };
 })();

@@ -40,6 +40,22 @@
       white-space: nowrap; flex-shrink: 0;
     }
 
+    /* ── Tab bar ─────────────────────────────────── */
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .tab-btn {
+      flex: 1; height: 36px; border: none; background: none;
+      color: #475569; font-size: 12px; font-weight: 500;
+      cursor: pointer; font-family: inherit;
+      border-bottom: 2px solid transparent;
+      transition: color 0.15s, border-color 0.15s;
+      letter-spacing: 0.01em;
+    }
+    .tab-btn:hover { color: #94a3b8; }
+    .tab-btn.active { color: #38bdf8; border-bottom-color: #38bdf8; }
+
     /* ── Status strip ────────────────────────────── */
     #status-strip {
       display: none;
@@ -56,24 +72,23 @@
     .err .dot { background: #f87171; }
     #status-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-    /* ── Body ────────────────────────────────────── */
+    /* ── Tab panels ──────────────────────────────── */
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Settings body ───────────────────────────── */
     .body { padding: 14px 16px; }
 
-    /* ── Section label ───────────────────────────── */
     .section-label {
       font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
       text-transform: uppercase; color: #334155; margin-bottom: 10px;
     }
-
-    /* ── Field ───────────────────────────────────── */
     .field { margin-bottom: 10px; }
     .field:last-child { margin-bottom: 0; }
     .field > label {
       display: block; font-size: 11.5px; color: #64748b;
       margin-bottom: 5px; font-weight: 500;
     }
-
-    /* Base input */
     input[type="text"],
     input[type="password"],
     input[type="number"] {
@@ -93,7 +108,6 @@
     }
     input::placeholder { color: #2d3f55; }
 
-    /* Token field with eye icon */
     .input-wrap { position: relative; }
     .input-wrap input { padding-right: 34px; }
     .eye-btn {
@@ -104,22 +118,14 @@
     }
     .eye-btn:hover { color: #64748b; }
 
-    /* Two-column row: Branch + Auto-sync */
     .two-col { display: grid; grid-template-columns: 1fr 90px; gap: 8px; margin-bottom: 10px; }
     .two-col .field { margin-bottom: 0; }
     input[type="number"] { text-align: center; }
-    .field-hint {
-      font-size: 11px; color: #334155; margin-top: 4px;
-    }
+    .field-hint { font-size: 11px; color: #334155; margin-top: 4px; }
 
-    /* ── Divider ─────────────────────────────────── */
     .divider { height: 1px; background: rgba(255,255,255,0.06); margin: 14px 0; }
 
-    /* ── Toggle row ──────────────────────────────── */
-    .toggle-row {
-      display: flex; align-items: center; gap: 12px;
-      padding: 2px 0;
-    }
+    .toggle-row { display: flex; align-items: center; gap: 12px; padding: 2px 0; }
     .toggle-info { flex: 1; min-width: 0; }
     .toggle-info strong { display: block; font-size: 12.5px; font-weight: 500; color: #cbd5e1; }
     .toggle-info span { display: block; font-size: 11px; color: #475569; margin-top: 1px; }
@@ -143,7 +149,6 @@
       transform: translateX(16px); background: #38bdf8;
     }
 
-    /* ── Buttons ─────────────────────────────────── */
     .actions { display: flex; gap: 8px; }
     .btn {
       flex: 1; height: 34px; border: none; border-radius: 8px;
@@ -162,6 +167,89 @@
       background: linear-gradient(135deg, #2563eb, #7c3aed);
       color: #fff;
     }
+
+    /* ── History tab ─────────────────────────────── */
+    .stats-body { padding: 14px 16px; }
+
+    .stat-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .stat-card {
+      background: #1e293b;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 9px;
+      padding: 10px 8px;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 20px; font-weight: 700; color: #f1f5f9;
+      letter-spacing: -0.02em; line-height: 1;
+    }
+    .stat-label {
+      font-size: 10px; color: #475569; margin-top: 4px;
+      font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase;
+    }
+
+    .history-header {
+      font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: #334155;
+      margin-bottom: 8px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .clear-btn {
+      background: none; border: none; cursor: pointer;
+      color: #334155; font-size: 10px; font-family: inherit;
+      letter-spacing: 0.04em; text-transform: uppercase;
+      padding: 0; transition: color 0.15s;
+    }
+    .clear-btn:hover { color: #f87171; }
+
+    .history-list {
+      max-height: 200px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #1e293b transparent;
+    }
+    .history-list::-webkit-scrollbar { width: 4px; }
+    .history-list::-webkit-scrollbar-track { background: transparent; }
+    .history-list::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+
+    .history-empty {
+      text-align: center; color: #334155;
+      font-size: 12px; padding: 28px 0;
+    }
+
+    .history-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .history-item:last-child { border-bottom: none; }
+
+    .hi-icon {
+      width: 20px; height: 20px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .hi-icon.ok       { background: rgba(52,211,153,0.12); color: #34d399; }
+    .hi-icon.uptodate { background: rgba(148,163,184,0.1);  color: #64748b; }
+    .hi-icon.err      { background: rgba(248,113,113,0.12); color: #f87171; }
+
+    .hi-body { flex: 1; min-width: 0; }
+    .hi-main { display: flex; align-items: center; gap: 6px; }
+    .hi-sha {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 11px; color: #38bdf8;
+      background: rgba(56,189,248,0.08);
+      padding: 1px 5px; border-radius: 4px; flex-shrink: 0;
+    }
+    .hi-files { font-size: 12px; color: #94a3b8; }
+    .hi-error { color: #f87171; font-size: 11px; margin-top: 1px;
+                white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .hi-time { font-size: 10.5px; color: #334155; flex-shrink: 0; white-space: nowrap; }
 
     /* ── Footer ──────────────────────────────────── */
     .footer {
@@ -204,96 +292,129 @@
     <span class="badge">v1.0</span>
   </div>
 
-  <!-- Status strip (shown after actions) -->
+  <!-- Tab bar -->
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="settings">Settings</button>
+    <button class="tab-btn" data-tab="history">History</button>
+  </div>
+
+  <!-- Status strip (settings tab only) -->
   <div id="status-strip">
     <div class="dot"></div>
     <span id="status-text"></span>
   </div>
 
-  <!-- Body -->
-  <div class="body">
+  <!-- ── Settings tab ───────────────────────────── -->
+  <div class="tab-panel active" id="tab-settings">
+    <div class="body">
 
-    <div class="section-label">GitHub</div>
+      <div class="section-label">GitHub</div>
 
-    <!-- Token -->
-    <div class="field">
-      <label>Personal Access Token</label>
-      <div class="input-wrap">
-        <input type="password" id="token" placeholder="ghp_xxxxxxxxxxxx" autocomplete="off" spellcheck="false">
-        <button class="eye-btn" id="toggleToken" tabindex="-1" title="Toggle visibility">
-          <svg id="eyeIcon" width="14" height="14" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-            <circle cx="12" cy="12" r="3"/>
+      <div class="field">
+        <label>Personal Access Token</label>
+        <div class="input-wrap">
+          <input type="password" id="token" placeholder="ghp_xxxxxxxxxxxx" autocomplete="off" spellcheck="false">
+          <button class="eye-btn" id="toggleToken" tabindex="-1" title="Toggle visibility">
+            <svg id="eyeIcon" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Repository</label>
+        <input type="text" id="repo" placeholder="owner/repository">
+      </div>
+
+      <div class="two-col">
+        <div class="field">
+          <label>Branch</label>
+          <input type="text" id="branch" placeholder="main">
+        </div>
+        <div class="field">
+          <label>Auto-sync</label>
+          <input type="number" id="interval" min="0" max="60" value="0">
+        </div>
+      </div>
+      <div class="field-hint">Auto-sync interval in minutes · 0 = disabled</div>
+
+      <div class="divider"></div>
+
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <strong>Show button on page</strong>
+          <span>Floating button in the bottom-right corner</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="showButton" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="actions">
+        <button class="btn btn-save" id="saveBtn">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+            <polyline points="17 21 17 13 7 13 7 21"/>
+            <polyline points="7 3 7 8 15 8"/>
           </svg>
+          Save
+        </button>
+        <button class="btn btn-sync" id="syncBtn">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="17 1 21 5 17 9"/>
+            <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+            <polyline points="7 23 3 19 7 15"/>
+            <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+          </svg>
+          Sync Now
         </button>
       </div>
-    </div>
 
-    <!-- Repo -->
-    <div class="field">
-      <label>Repository</label>
-      <input type="text" id="repo" placeholder="owner/repository">
     </div>
+  </div>
 
-    <!-- Branch + Auto-sync on same row -->
-    <div class="two-col">
-      <div class="field">
-        <label>Branch</label>
-        <input type="text" id="branch" placeholder="main">
+  <!-- ── History tab ────────────────────────────── -->
+  <div class="tab-panel" id="tab-history">
+    <div class="stats-body">
+
+      <div class="stat-cards">
+        <div class="stat-card">
+          <div class="stat-value" id="stat-total">–</div>
+          <div class="stat-label">Syncs</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-files">–</div>
+          <div class="stat-label">Files</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-rate">–</div>
+          <div class="stat-label">Success</div>
+        </div>
       </div>
-      <div class="field">
-        <label>Auto-sync</label>
-        <input type="number" id="interval" min="0" max="60" value="0">
+
+      <div class="history-header">
+        <span>Recent syncs</span>
+        <button class="clear-btn" id="clearHistory">Clear</button>
       </div>
-    </div>
-    <div class="field-hint">Auto-sync interval in minutes · 0 = disabled</div>
-
-    <div class="divider"></div>
-
-    <!-- Show button toggle -->
-    <div class="toggle-row">
-      <div class="toggle-info">
-        <strong>Show button on page</strong>
-        <span>Floating button in the bottom-right corner</span>
+      <div class="history-list" id="history-list">
+        <div class="history-empty">No syncs yet</div>
       </div>
-      <label class="switch">
-        <input type="checkbox" id="showButton" checked>
-        <span class="slider"></span>
-      </label>
+
     </div>
-
-    <div class="divider"></div>
-
-    <!-- Action buttons -->
-    <div class="actions">
-      <button class="btn btn-save" id="saveBtn">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-          <polyline points="17 21 17 13 7 13 7 21"/>
-          <polyline points="7 3 7 8 15 8"/>
-        </svg>
-        Save
-      </button>
-      <button class="btn btn-sync" id="syncBtn">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="17 1 21 5 17 9"/>
-          <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
-          <polyline points="7 23 3 19 7 15"/>
-          <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
-        </svg>
-        Sync Now
-      </button>
-    </div>
-
   </div>
 
   <!-- Footer -->
   <div class="footer">
     <span class="footer-meta">AI Studio Git Sync · v1.0</span>
-    <a href="https://github.com" target="_blank">GitHub</a>
+    <a href="https://github.com/yusufkizgin/aistudio-git-sync" target="_blank">GitHub</a>
   </div>
 
   <script src="popup.js"></script>

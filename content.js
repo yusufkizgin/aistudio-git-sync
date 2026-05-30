@@ -75,6 +75,26 @@
     </svg>`;
   }
 
+  // ── Sync history recording ───────────────────────────────────────────────
+
+  async function recordSync({ ok, files, sha, uptodate, error }) {
+    try {
+      const MAX = 50;
+      const stored  = await chrome.storage.local.get("syncHistory");
+      const history = stored.syncHistory || [];
+      history.unshift({
+        ts: Date.now(),
+        ok,
+        files:    files    || 0,
+        sha:      sha      ? sha.slice(0, 7) : null,
+        uptodate: !!uptodate,
+        error:    error    || null,
+      });
+      if (history.length > MAX) history.length = MAX;
+      await chrome.storage.local.set({ syncHistory: history });
+    } catch (_) { /* silent */ }
+  }
+
   // ── Core sync logic ──────────────────────────────────────────────────────
 
   async function cacheFileForInterceptor(base64) {
@@ -128,7 +148,7 @@
     }
 
     await chrome.storage.local.set({ [storageKey]: latestSha, lastSyncTime: Date.now() });
-    return { message: `Synced ${files.length} files`, sha: latestSha };
+    return { message: `Synced ${files.length} files`, sha: latestSha, fileCount: files.length };
   }
 
   // ── Background message handler ────────────────────────────────────────────
@@ -136,7 +156,9 @@
     if (msg.type === "SYNC" && msg.appletId === appletId) {
       runSync()
         .then(result => {
-          if (!result.message.startsWith("Already")) {
+          const uptodate = result.message.startsWith("Already");
+          recordSync({ ok: true, files: result.fileCount, sha: result.sha, uptodate });
+          if (!uptodate) {
             setStatus("success", `${result.message} — reloading…`);
             setTimeout(() => location.reload(), 2000);
           } else {
@@ -146,6 +168,7 @@
           sendResponse({ ok: true, ...result });
         })
         .catch(err => {
+          recordSync({ ok: false, error: err.message });
           setStatus("error", err.message);
           sendResponse({ ok: false, error: err.message });
         });
@@ -243,7 +266,9 @@
       setStatus("syncing", "Syncing…");
       try {
         const result = await runSync();
-        if (result.message.startsWith("Already")) {
+        const uptodate = result.message.startsWith("Already");
+        recordSync({ ok: true, files: result.fileCount, sha: result.sha, uptodate });
+        if (uptodate) {
           setStatus("uptodate", `Up to date · ${formatTime(Date.now())}`);
           setTimeout(() => setStatus("idle", `Last: ${formatTime(Date.now())}`), 3000);
         } else {
@@ -251,6 +276,7 @@
           setTimeout(() => location.reload(), 2000);
         }
       } catch (err) {
+        recordSync({ ok: false, error: err.message });
         setStatus("error", err.message);
       }
     });

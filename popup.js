@@ -1,5 +1,18 @@
 const $ = id => document.getElementById(id);
 
+// ── Tab switching ─────────────────────────────────────────────────────────
+
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const tab = btn.dataset.tab;
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+    btn.classList.add("active");
+    $("tab-" + tab).classList.add("active");
+    if (tab === "history") renderHistory();
+  });
+});
+
 // ── Helpers ──────────────────────────────────────────────────────────────
 
 function showStatus(msg, isError) {
@@ -20,6 +33,17 @@ async function getActiveAppletId() {
   return m ? m[1] : null;
 }
 
+function timeAgo(ts) {
+  const diff = Date.now() - ts;
+  const s = Math.floor(diff / 1000);
+  if (s < 60)  return `${s}s ago`;
+  const m = Math.floor(s / 60);
+  if (m < 60)  return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24)  return `${h}h ago`;
+  return `${Math.floor(h / 24)}d ago`;
+}
+
 // ── Load saved settings ───────────────────────────────────────────────────
 
 chrome.storage.sync.get(
@@ -28,7 +52,7 @@ chrome.storage.sync.get(
     if (s.githubToken) $("token").value = s.githubToken;
     if (s.githubRepo)  $("repo").value  = s.githubRepo;
     $("branch").value = s.githubBranch || "main";
-    $("showButton").checked = s.showButton !== false; // default true
+    $("showButton").checked = s.showButton !== false;
   }
 );
 
@@ -118,7 +142,73 @@ $("syncBtn").addEventListener("click", async () => {
   });
 });
 
-// Inject spin keyframe into popup
+// ── History tab ───────────────────────────────────────────────────────────
+
+function svgIcon(path, color, size = 11) {
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none"
+    stroke="${color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">${path}</svg>`;
+}
+
+function renderHistory() {
+  chrome.storage.local.get("syncHistory", ({ syncHistory }) => {
+    const history = syncHistory || [];
+
+    // Aggregate stats
+    const total     = history.length;
+    const successes = history.filter(e => e.ok).length;
+    const files     = history.reduce((sum, e) => sum + (e.ok && !e.uptodate ? e.files : 0), 0);
+    const rate      = total > 0 ? Math.round((successes / total) * 100) : null;
+
+    $("stat-total").textContent = total || "–";
+    $("stat-files").textContent = files > 999 ? `${(files / 1000).toFixed(1)}k` : (files || "–");
+    $("stat-rate").textContent  = rate !== null ? `${rate}%` : "–";
+
+    // History list
+    const list = $("history-list");
+    if (!history.length) {
+      list.innerHTML = `<div class="history-empty">No syncs yet</div>`;
+      return;
+    }
+
+    list.innerHTML = history.map(entry => {
+      let iconClass, iconSvg, mainHtml;
+
+      if (!entry.ok) {
+        iconClass = "err";
+        iconSvg   = svgIcon(`<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>`, "#f87171");
+        mainHtml  = `<span style="color:#f87171;font-size:11px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+                       ${entry.error || "Unknown error"}
+                     </span>`;
+      } else if (entry.uptodate) {
+        iconClass = "uptodate";
+        iconSvg   = svgIcon(`<polyline points="20 6 9 17 4 12"/>`, "#64748b");
+        mainHtml  = `${entry.sha ? `<span class="hi-sha">${entry.sha}</span>` : ""}
+                     <span class="hi-files">Up to date</span>`;
+      } else {
+        iconClass = "ok";
+        iconSvg   = svgIcon(`<polyline points="20 6 9 17 4 12"/>`, "#34d399");
+        mainHtml  = `${entry.sha ? `<span class="hi-sha">${entry.sha}</span>` : ""}
+                     <span class="hi-files">${entry.files} file${entry.files !== 1 ? "s" : ""}</span>`;
+      }
+
+      return `
+        <div class="history-item">
+          <div class="hi-icon ${iconClass}">${iconSvg}</div>
+          <div class="hi-body">
+            <div class="hi-main">${mainHtml}</div>
+          </div>
+          <div class="hi-time">${timeAgo(entry.ts)}</div>
+        </div>`;
+    }).join("");
+  });
+}
+
+$("clearHistory").addEventListener("click", () => {
+  chrome.storage.local.remove("syncHistory", renderHistory);
+});
+
+// ── Spin keyframe ─────────────────────────────────────────────────────────
+
 const st = document.createElement("style");
 st.textContent = "@keyframes spin { to { transform: rotate(360deg); } }";
 document.head.appendChild(st);

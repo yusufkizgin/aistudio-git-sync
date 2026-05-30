@@ -1,5 +1,8 @@
 const FS_ENDPOINT = "https://alkalimakersuite-pa.clients6.google.com/$rpc/google.alkali.boq.makersuite.makersuiteappletcontrol.proto.MakersuiteAppletControlService/ApplyFileSystemOperation";
-const API_KEY = "AIzaSyDdP816MREB3SkjZO04QXbjsigfcI0GWOs";
+
+function getApiKey() {
+  return localStorage.getItem("gs_api_key") || "";
+}
 
 async function fsRequest(operations, appletId, authHeader) {
   // credentials: "include" sends google.com cookies automatically because
@@ -10,7 +13,7 @@ async function fsRequest(operations, appletId, authHeader) {
     headers: {
       "content-type": "application/json+protobuf",
       "authorization": authHeader,
-      "x-goog-api-key": API_KEY,
+      "x-goog-api-key": getApiKey(),
       "x-goog-authuser": "0",
       "x-user-agent": "grpc-web-javascript/0.1",
     },
