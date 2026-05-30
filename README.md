@@ -37,7 +37,7 @@ This extension is not on the Chrome Web Store. Install it in **Developer Mode**:
 ### 1. Download the extension
 
 ```bash
-git clone https://github.com/your-username/aistudio-git-sync.git
+git clone https://github.com/yusufkizgin/aistudio-git-sync.git
 ```
 
 Or download the ZIP from GitHub and extract it.
