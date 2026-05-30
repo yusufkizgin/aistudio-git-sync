@@ -1,7 +1,7 @@
 const FS_ENDPOINT = "https://alkalimakersuite-pa.clients6.google.com/$rpc/google.alkali.boq.makersuite.makersuiteappletcontrol.proto.MakersuiteAppletControlService/ApplyFileSystemOperation";
 
 function getApiKey() {
-  return localStorage.getItem("gs_api_key") || "";
+  return localStorage.getItem("gs_api_key") || "AIzaSyDdP816MREB3SkjZO04QXbjsigfcI0GWOs";
 }
 
 async function fsRequest(operations, appletId, authHeader) {
